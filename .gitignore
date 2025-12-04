@@ -1,0 +1,45 @@
+# .gitignore para proyecto .NET / Visual Studio
+# Evita que archivos binarios, temporales y de IDE se suban al repositorio
+
+# Build artifacts
+bin/
+obj/
+artifacts/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.DotSettings.user
+
+# Visual Studio Code
+.vscode/
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs
+*.log
+
+# Ignore publish output
+publish/
+
+# Runtime/native folders
+runtimes/
+
+# Optional: keep EditorConfig and README tracked
+!.editorconfig
+!README.md
