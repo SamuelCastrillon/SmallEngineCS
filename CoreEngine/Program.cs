@@ -6,8 +6,10 @@ using OpenTK.Mathematics;
 
 namespace SmallEngineCS
 {
+    //? Punto de entrada de la aplicación
     public static class Program
     {
+        //? Crea la ventana del juego y ejecuta el bucle principal
         public static void Main(string[] args)
         {
             using (Game game = new Game(800, 600, "Small Engine CS"))
@@ -20,9 +22,11 @@ namespace SmallEngineCS
         }
     }
 
+    //? Clase principal que maneja la ventana de juego y la lógica de renderizado
     public class Game : GameWindow
     {
-        Shader shader;
+        private Shader shader = null!;  //? Shader compilado para renderizar
+        private int VertexArrayObject;  //? Identificador del Vertex Array Object
 
         //? Vectores de vertices para un triangulo 3D
         float[] vertices = {
@@ -32,10 +36,11 @@ namespace SmallEngineCS
             -0.5f, -0.5f, 0.0f,  // bottom left
         };
 
+        //? Constructor: inicializa la ventana con dimensiones y título
         public Game(int width, int height, string title)
             : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = new Vector2i(width, height), Title = title })
         {
-
+            // Configuración de la ventana realizada en el constructor base
         }
 
         //? Esta funcion se ejecuta en cada frame para actualizar la logica del juego
@@ -43,8 +48,7 @@ namespace SmallEngineCS
         {
             base.OnUpdateFrame(args);
 
-
-
+            //? Cerrar la ventana si se presiona Escape
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
@@ -56,53 +60,72 @@ namespace SmallEngineCS
         {
             base.OnLoad();
 
+            //? Establecer color de fondo (RGB + Alpha)
             GL.ClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 
-            //? ID del Vertex Buffer Object
+            //? ID del Vertex Buffer Object - almacena datos de vertices en la GPU
             int VertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject); // Bind del VBO
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw); // Carga de datos al VBO
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject); //? Activar el buffer
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw); //? Copiar datos de vertices al GPU
 
-            shader = new Shader("CoreEngine/shader/shader.vert", "CoreEngine/shader/shader.frag"); // Carga y compila los shaders
+            //? Cargar y compilar los shaders (vertex y fragment)
+            shader = new Shader("CoreEngine/shader/shader.vert", "CoreEngine/shader/shader.frag");
 
-            int VertexArrayObject = GL.GenVertexArray();
-            GL.BindVertexArray(VertexArrayObject);
+            //? Crear y configurar el Vertex Array Object (VAO)
+            VertexArrayObject = GL.GenVertexArray();
+            GL.BindVertexArray(VertexArrayObject); //? Activar el VAO
 
+            //? Configurar atributo de posición (layout location = 0)
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
+            //? Vincular buffer y cargar datos de vertices
             GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
+            //? Configurar atributo de posición nuevamente (redundante pero necesario para el VAO)
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
+            //? Activar el shader program
             shader.Use();
 
         }
 
+        //? Esta función se ejecuta cada frame para renderizar la escena
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);
 
-
+            //? Limpiar el buffer de color con el color de fondo establecido
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
+            //? Activar el shader program
+            shader.Use();
+            //? Vincular el VAO que contiene la geometría del triángulo
+            GL.BindVertexArray(VertexArrayObject);
+            //? Dibujar el triángulo (3 vertices)
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
+            //? Intercambiar buffers para mostrar el frame renderizado
             SwapBuffers();
         }
 
+        //? Se ejecuta cuando cambia el tamaño de la ventana
         protected override void OnFramebufferResize(FramebufferResizeEventArgs e)
         {
             base.OnFramebufferResize(e);
 
+            //? Actualizar viewport para que coincida con las nuevas dimensiones
             GL.Viewport(0, 0, e.Width, e.Height);
         }
 
+        //? Se ejecuta cuando la ventana se cierra para liberar recursos
         protected override void OnUnload()
         {
             base.OnUnload();
 
+            //? Liberar recursos del shader (GPU memory)
             shader.Dispose();
         }
 
@@ -110,12 +133,12 @@ namespace SmallEngineCS
 
 
 
-    //? Clase para manejar shaders
+    //? Clase para manejar shaders - compila y linkea programas de GPU
     public class Shader
     {
-        int Handle;
-        int VertexShader;
-        int FragmentShader;
+        int Handle;           //? Identificador del programa de shader compilado
+        int VertexShader;     //? Identificador del vertex shader
+        int FragmentShader;   //? Identificador del fragment shader
         public Shader(string vertexPath, string fragmentPath)
         {
             //? Leer los archivos de los shaders
@@ -163,7 +186,7 @@ namespace SmallEngineCS
                 Console.WriteLine($"Error al enlazar el shader: {infoLog}");
             }
 
-            //TODO: Limpiar los shaders ya que estan enlazados en el programa
+            //? Limpiar los shaders individuales ya que están compilados en el programa
             GL.DetachShader(Handle, VertexShader);
             GL.DetachShader(Handle, FragmentShader);
             GL.DeleteShader(VertexShader);
@@ -175,22 +198,24 @@ namespace SmallEngineCS
         //? Implementacion de IDisposable para liberar recursos GPU
         private bool disposedValue = false;
 
+        //? Activar este programa de shader para renderizar
         public void Use()
         {
             GL.UseProgram(Handle);
-
         }
 
+        //? Liberar recursos de GPU - patrón IDisposable
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
+                //? Eliminar el programa de shader de GPU
                 GL.DeleteProgram(Handle);
-
                 disposedValue = true;
             }
         }
 
+        //? Destructor - detecta si se olvidó liberar recursos manualmente
         ~Shader()
         {
             if (disposedValue == false)
@@ -199,7 +224,7 @@ namespace SmallEngineCS
             }
         }
 
-
+        //? Método público para liberar recursos
         public void Dispose()
         {
             Dispose(true);
