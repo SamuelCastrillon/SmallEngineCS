@@ -1,0 +1,15 @@
+# Configuración base para el lenguaje C#
+[*.cs]
+
+# Reglas de estilo de código (Ejemplos)
+# Usar "var" cuando el tipo es obvio
+csharp_style_var_for_built_in_types = true:suggestion
+# Ordenar directivas "using"
+csharp_style_using_directives_placement = inside_namespace:warning
+# Usar llaves si es necesario, incluso para una sola línea
+csharp_style_braces_for_single_line_statements = true:error
+
+# Reglas de formato (Ejemplos)
+# Sangría (indentación) con 4 espacios
+indent_style = space
+indent_size = 4
