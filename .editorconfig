@@ -13,3 +13,8 @@ csharp_style_braces_for_single_line_statements = true:error
 # Sangría (indentación) con 4 espacios
 indent_style = space
 indent_size = 4
+
+# Eliminar líneas en blanco excesivas
+# Máximo 1 línea en blanco dentro de bloques de código
+csharp_max_blank_lines_between_members = 1
+csharp_max_blank_lines_in_code = 1
