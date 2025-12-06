@@ -6,13 +6,15 @@ using OpenTK.Mathematics;
 
 namespace SmallEngineCS
 {
+
     //? Punto de entrada de la aplicación
     public static class Program
+
     {
         //? Crea la ventana del juego y ejecuta el bucle principal
         public static void Main(string[] args)
         {
-            using (Game game = new Game(800, 600, "Small Engine CS"))
+            using (Game game = new Game(1920, 1080, "Small Engine CS"))
             {
                 game.Run();
             }
@@ -38,6 +40,9 @@ namespace SmallEngineCS
             : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = new Vector2i(width, height), Title = title })
         {
             // Configuración de la ventana realizada en el constructor base
+            ClientSize = new Vector2i(width, height);
+            Title = title;
+            WindowState = WindowState.Normal;
         }
 
         //? Esta funcion se ejecuta en cada frame para actualizar la logica del juego
@@ -50,7 +55,17 @@ namespace SmallEngineCS
             {
                 Close();
             }
+
+            //? Presionar F11 para alternar pantalla completa
+            if (KeyboardState.IsKeyPressed(Keys.F11))
+            {
+                WindowState = WindowState == WindowState.Fullscreen
+                    ? WindowState.Normal
+                    : WindowState.Fullscreen;
+            }
         }
+
+
 
         //? Esta funcion se ejecuta una vez al cargar el juego
         protected override void OnLoad()
@@ -127,8 +142,6 @@ namespace SmallEngineCS
         }
 
     }
-
-
 
     //? Clase para manejar shaders - compila y linkea programas de GPU
     public class Shader

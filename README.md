@@ -24,12 +24,7 @@ dotnet build -c Release
 ### Run
 Ejecuta la aplicación:
 ```powershell
-dotnet run
-```
-
-Ejecutar proyecto específico:
-```powershell
-dotnet run --project CoreEngine/CoreEngine.csproj
+dotnet watch run --project CoreEngine/CoreEngine.csproj
 ```
 
 ### Test
